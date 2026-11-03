@@ -9,8 +9,8 @@ report as DOCX or PDF.
 - **Contact record:** loads the Contact, its related `Applications`, and each
   Matter's `Application_History` related list.
 - **Application record:** loads the current Matter and its primary Contact.
-- **Local browser:** automatically uses representative demo data so the full
-  preview and download flow can be tested outside Zoho CRM.
+- **Local browser:** shows a clear CRM-context message instead of substituting
+  sample records. Report values are only loaded from Zoho CRM.
 
 The widget is read-only. It does not create or update CRM records.
 
@@ -35,8 +35,9 @@ pnpm install
 pnpm dev
 ```
 
-Open the local URL shown by Vite. When the Zoho Embedded App SDK is unavailable,
-the widget starts in Demo data mode.
+Open the local URL shown by Vite to verify the shell. Live report data is
+available only when the widget is opened from a Contact or Matter record in
+Zoho CRM; the widget never substitutes demo records at runtime.
 
 ## Test and build
 

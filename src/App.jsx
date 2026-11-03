@@ -34,7 +34,7 @@ const App = () => {
     try {
       const normalized = normalizeSource(await initializeWidget());
       const owners = ownerOptionsFromSource(normalized);
-      const initialRange = normalized.mode === "demo" ? sourceRange(normalized) : defaultRange;
+      const initialRange = sourceRange(normalized);
       setSource(normalized);
       setStartDate(initialRange.startDate);
       setEndDate(initialRange.endDate);

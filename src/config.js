@@ -1,6 +1,7 @@
 export const CRM_CONFIG = {
   contactsModule: "Contacts",
   mattersModule: "Applications",
+  matterModuleAliases: ["applications", "application", "applications1", "deals"],
   contactMattersRelatedList: "Applications",
   matterHistoryRelatedLists: ["Application_History", "Applications_History"],
   fields: {

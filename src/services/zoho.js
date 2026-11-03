@@ -1,5 +1,4 @@
 import { CRM_CONFIG, REPORT_DEFAULTS } from "../config";
-import { createMockSource } from "../data/mockData";
 
 const getZoho = () => window.ZOHO;
 
@@ -125,7 +124,7 @@ const loadFromZoho = async ({ entity, recordId }) => {
       recordId,
       relatedList: CRM_CONFIG.contactMattersRelatedList,
     });
-  } else if (["applications", "application"].includes(normalizedEntity)) {
+  } else if (CRM_CONFIG.matterModuleAliases.includes(normalizedEntity)) {
     const matter = await getRecord(CRM_CONFIG.mattersModule, recordId);
     contact = await contactFromMatter(matter);
     matters = [matter];
@@ -149,14 +148,15 @@ const loadFromZoho = async ({ entity, recordId }) => {
 
 export const initializeWidget = async () => {
   const zoho = getZoho();
-  let embedded = false;
-  try {
-    embedded = window.self !== window.top;
-  } catch {
-    embedded = true;
-  }
-  if (!embedded || !zoho?.embeddedApp?.init || !zoho?.embeddedApp?.on) {
-    return createMockSource();
+  if (
+    !zoho?.embeddedApp?.init ||
+    !zoho?.embeddedApp?.on ||
+    !zoho?.CRM?.API?.getRecord ||
+    !zoho?.CRM?.API?.getRelatedRecords
+  ) {
+    throw new Error(
+      "Live Zoho CRM context is unavailable. Open this widget from a Contact or Matter record in Zoho CRM."
+    );
   }
 
   const pageContext = await new Promise((resolve, reject) => {
