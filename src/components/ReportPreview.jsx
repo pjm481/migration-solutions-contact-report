@@ -1,14 +1,16 @@
 import { useState } from "react";
 import {
   AlertCircle,
+  BriefcaseBusiness,
   CalendarDays,
   Clock3,
   Download,
   FileText,
   ListFilter,
   LoaderCircle,
+  Users,
 } from "lucide-react";
-import OwnerPicker from "./OwnerPicker";
+import MultiSelectPicker from "./MultiSelectPicker";
 import {
   formatDisplayDate,
   formatDuration,
@@ -93,12 +95,16 @@ const ReportPreview = ({
   report,
   filterMessage,
   owners,
+  matters,
+  matterContext,
   startDate,
   endDate,
   selectedOwnerIds,
+  selectedMatterIds,
   onStartDateChange,
   onEndDateChange,
   onSelectedOwnerIdsChange,
+  onSelectedMatterIdsChange,
 }) => {
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [downloadState, setDownloadState] = useState(null);
@@ -206,14 +212,27 @@ const ReportPreview = ({
               />
             </span>
           </label>
-          <OwnerPicker
-            owners={owners}
+          <MultiSelectPicker
+            label="History owner"
+            pluralLabel="owners"
+            icon={Users}
+            options={owners}
             selectedIds={selectedOwnerIds}
             onChange={onSelectedOwnerIdsChange}
             disabled={!owners.length}
           />
+          <MultiSelectPicker
+            label="Matter No"
+            pluralLabel="matters"
+            icon={BriefcaseBusiness}
+            options={matters}
+            selectedIds={selectedMatterIds}
+            onChange={onSelectedMatterIdsChange}
+            disabled={matterContext || !matters.length}
+          />
           <div className="report-filters__summary" aria-live="polite">
-            Showing {formatRecordCount(report?.ownerCount || 0, "owner")} and{" "}
+            Showing {formatRecordCount(report?.matters.length || 0, "matter")},{" "}
+            {formatRecordCount(report?.ownerCount || 0, "owner")}, and{" "}
             {formatRecordCount(report?.entryCount || 0, "time entry", "time entries")}.
           </div>
         </section>

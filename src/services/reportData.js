@@ -123,6 +123,11 @@ export const ownerOptionsFromSource = (source) => {
   return [...owners.values()].sort((a, b) => a.name.localeCompare(b.name));
 };
 
+export const matterOptionsFromSource = (source) =>
+  source.matters
+    .map((matter) => ({ id: matter.id, name: matter.matterNumber }))
+    .sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
 const withinRange = (date, startDate, endDate) => {
   if (!date) return false;
   const start = new Date(`${startDate}T00:00:00`);
@@ -141,12 +146,15 @@ const aggregateBy = (records, field) => {
 
 export const buildReport = (
   source,
-  { startDate, endDate, selectedOwnerIds }
+  { startDate, endDate, selectedOwnerIds, selectedMatterIds }
 ) => {
   const selected = new Set(selectedOwnerIds || []);
+  const selectedMatters =
+    selectedMatterIds === undefined ? null : new Set(selectedMatterIds);
   const filteredRecords = source.histories.filter(
     (history) =>
       selected.has(history.ownerId) &&
+      (!selectedMatters || selectedMatters.has(history.matterId)) &&
       withinRange(history.date, startDate, endDate) &&
       history.durationMinutes > 0
   );

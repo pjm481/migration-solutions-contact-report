@@ -2,6 +2,7 @@ import { describe, expect, test } from "vitest";
 import { createMockSource } from "../data/mockData";
 import {
   buildReport,
+  matterOptionsFromSource,
   normalizeSource,
   ownerOptionsFromSource,
 } from "./reportData";
@@ -13,6 +14,13 @@ describe("time spent report data", () => {
     expect(ownerOptionsFromSource(source)).toEqual([
       { id: "admin", name: "Admin" },
       { id: "nam", name: "Nam Hoang" },
+    ]);
+  });
+
+  test("discovers Matters in Matter No order", () => {
+    expect(matterOptionsFromSource(source)).toEqual([
+      { id: "matter-bb1", name: "BB1" },
+      { id: "matter-1", name: "Matter 1" },
     ]);
   });
 
@@ -56,5 +64,20 @@ describe("time spent report data", () => {
     });
     expect(report.entryCount).toBe(3);
     expect(report.totalMinutes).toBe(65);
+  });
+
+  test("filters the report to selected Matter numbers", () => {
+    const report = buildReport(source, {
+      startDate: "2026-10-01",
+      endDate: "2026-10-31",
+      selectedOwnerIds: ["nam", "admin"],
+      selectedMatterIds: ["matter-bb1"],
+    });
+
+    expect(report.matters).toHaveLength(1);
+    expect(report.matters[0]).toMatchObject({
+      id: "matter-bb1",
+      matterNumber: "BB1",
+    });
   });
 });

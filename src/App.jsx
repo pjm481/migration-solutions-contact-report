@@ -1,7 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { AlertCircle, LoaderCircle, RefreshCw } from "lucide-react";
 import ReportPreview from "./components/ReportPreview";
-import { buildReport, normalizeSource, ownerOptionsFromSource } from "./services/reportData";
+import { CRM_CONFIG } from "./config";
+import {
+  buildReport,
+  matterOptionsFromSource,
+  normalizeSource,
+  ownerOptionsFromSource,
+} from "./services/reportData";
 import { initializeWidget } from "./services/zoho";
 import { currentMonthRange, toDateInputValue } from "./utils/format";
 
@@ -27,6 +33,7 @@ const App = () => {
   const [startDate, setStartDate] = useState(defaultRange.startDate);
   const [endDate, setEndDate] = useState(defaultRange.endDate);
   const [selectedOwnerIds, setSelectedOwnerIds] = useState([]);
+  const [selectedMatterIds, setSelectedMatterIds] = useState([]);
 
   const load = async () => {
     setLoading(true);
@@ -39,6 +46,7 @@ const App = () => {
       setStartDate(initialRange.startDate);
       setEndDate(initialRange.endDate);
       setSelectedOwnerIds(owners.map((owner) => owner.id));
+      setSelectedMatterIds(normalized.matters.map((matter) => matter.id));
     } catch (loadError) {
       setError(loadError?.message || "The CRM report data could not be loaded.");
     } finally {
@@ -56,6 +64,20 @@ const App = () => {
     () => (source ? ownerOptionsFromSource(source) : []),
     [source]
   );
+  const matters = useMemo(
+    () => (source ? matterOptionsFromSource(source) : []),
+    [source]
+  );
+  const matterContext = useMemo(
+    () =>
+      Boolean(
+        source &&
+          CRM_CONFIG.matterModuleAliases.includes(
+            String(source.entity || "").toLowerCase()
+          )
+      ),
+    [source]
+  );
 
   const filterMessage = useMemo(() => {
     if (!startDate || !endDate) return "Choose both a start date and an end date.";
@@ -63,13 +85,19 @@ const App = () => {
       return "The end date must be on or after the start date.";
     }
     if (!selectedOwnerIds.length) return "Select at least one history owner.";
+    if (!selectedMatterIds.length) return "Select at least one Matter No.";
     return "";
-  }, [endDate, selectedOwnerIds, startDate]);
+  }, [endDate, selectedMatterIds, selectedOwnerIds, startDate]);
 
   const report = useMemo(() => {
     if (!source || filterMessage) return null;
-    return buildReport(source, { startDate, endDate, selectedOwnerIds });
-  }, [source, startDate, endDate, selectedOwnerIds, filterMessage]);
+    return buildReport(source, {
+      startDate,
+      endDate,
+      selectedOwnerIds,
+      selectedMatterIds,
+    });
+  }, [source, startDate, endDate, selectedOwnerIds, selectedMatterIds, filterMessage]);
 
   if (loading) {
     return (
@@ -103,12 +131,16 @@ const App = () => {
       report={report}
       filterMessage={filterMessage}
       owners={owners}
+      matters={matters}
+      matterContext={matterContext}
       startDate={startDate}
       endDate={endDate}
       selectedOwnerIds={selectedOwnerIds}
+      selectedMatterIds={selectedMatterIds}
       onStartDateChange={setStartDate}
       onEndDateChange={setEndDate}
       onSelectedOwnerIdsChange={setSelectedOwnerIds}
+      onSelectedMatterIdsChange={setSelectedMatterIds}
     />
   );
 };

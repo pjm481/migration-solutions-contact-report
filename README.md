@@ -8,7 +8,8 @@ report as DOCX or PDF.
 
 - **Contact record:** loads the Contact, its related `Applications`, and each
   Matter's `Application_History` related list.
-- **Application record:** loads the current Matter and its primary Contact.
+- **Application (Matter) record:** loads only the current Matter and its primary
+  Contact. Date and History Owner filters remain available.
 - **Local browser:** shows a clear CRM-context message instead of substituting
   sample records. Report values are only loaded from Zoho CRM.
 
@@ -18,6 +19,8 @@ The widget is read-only. It does not create or update CRM records.
 
 - Inclusive start and end dates.
 - Multi-select History Owner filter with Select All and Clear All.
+- Multi-select Matter No filter when opened from a Contact record.
+- Matter No is fixed to the current Matter on a Matter detail record.
 - Compact filters in the report toolbar; there is no separate setup page.
 - One report page per Matter.
 - One summary per Staff Member, aggregating minutes by Stage, Category, and
@@ -53,7 +56,10 @@ so the generated files work when hosted from a Zoho widget path.
 
 After a successful build, zip the **contents** of `dist` so that `index.html` is
 at the root of the archive. Upload that archive as a Zoho CRM widget and place
-it on either a Contact or Application record page.
+it on either a Contact or Application record page. To expose the same report
+button in both locations, configure the Zoho CRM custom button to open this
+widget for both the `Contacts` and `Applications` modules. The widget reads the
+PageLoad context and selects the correct report scope automatically.
 
 The widget loads Zoho's embedded SDK from:
 
