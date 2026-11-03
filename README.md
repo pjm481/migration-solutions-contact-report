@@ -1,8 +1,8 @@
 # Time Spent Report Widget
 
-A new Zoho CRM embedded widget that builds the Time Spent Matter Report from
-Matter History, opens an on-screen preview, and downloads the same report as
-DOCX or PDF.
+A Zoho CRM embedded widget that builds the Time Spent Matter Report from Matter
+History. The widget opens directly on the report preview and downloads the same
+report as DOCX or PDF.
 
 ## Supported CRM contexts
 
@@ -18,6 +18,7 @@ The widget is read-only. It does not create or update CRM records.
 
 - Inclusive start and end dates.
 - Multi-select History Owner filter with Select All and Clear All.
+- Compact filters in the report toolbar; there is no separate setup page.
 - One report page per Matter.
 - One summary per Staff Member, aggregating minutes by Stage, Category, and
   Activity Type.

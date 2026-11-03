@@ -1,11 +1,14 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
+  AlertCircle,
+  CalendarDays,
   Clock3,
   Download,
   FileText,
+  ListFilter,
   LoaderCircle,
-  X,
 } from "lucide-react";
+import OwnerPicker from "./OwnerPicker";
 import {
   formatDisplayDate,
   formatDuration,
@@ -86,23 +89,25 @@ const MatterPage = ({ report, matter }) => (
   </article>
 );
 
-const ReportPreview = ({ report, onClose }) => {
+const ReportPreview = ({
+  report,
+  filterMessage,
+  owners,
+  startDate,
+  endDate,
+  selectedOwnerIds,
+  onStartDateChange,
+  onEndDateChange,
+  onSelectedOwnerIdsChange,
+}) => {
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [downloadState, setDownloadState] = useState(null);
   const [downloadError, setDownloadError] = useState("");
-
-  useEffect(() => {
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.body.classList.add("modal-open");
-    window.addEventListener("keydown", handleKeyDown);
-    return () => {
-      document.body.classList.remove("modal-open");
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [onClose]);
+  const hasEntries = Boolean(report?.entryCount);
+  const emptyMessage = filterMessage || "No time entries match these filters.";
 
   const download = async (type) => {
+    if (!hasEntries) return;
     setDownloadState(type);
     setDownloadError("");
     try {
@@ -121,7 +126,7 @@ const ReportPreview = ({ report, onClose }) => {
   };
 
   return (
-    <div className="report-modal" role="dialog" aria-modal="true" aria-label="Time spent report preview">
+    <div className="report-view" aria-label="Time spent report preview">
       <header className="report-toolbar">
         <div className="report-toolbar__title">
           <span className="report-toolbar__icon" aria-hidden="true">
@@ -130,20 +135,29 @@ const ReportPreview = ({ report, onClose }) => {
           <span>
             <strong>Report preview</strong>
             <small>
-              {formatRecordCount(report.matters.length, "matter")} ·{" "}
-              {formatRecordCount(report.entryCount, "time entry", "time entries")}
+              {formatRecordCount(report?.matters.length || 0, "matter")} ·{" "}
+              {formatRecordCount(report?.entryCount || 0, "time entry", "time entries")}
             </small>
           </span>
         </div>
         <div className="report-toolbar__actions">
           <div className="report-toolbar__total">
-            <Clock3 size={16} /> {formatDuration(report.totalMinutes)}
+            <Clock3 size={16} /> {formatDuration(report?.totalMinutes || 0)}
           </div>
+          <button
+            type="button"
+            className={`button button--toolbar ${filtersOpen ? "is-active" : ""}`}
+            onClick={() => setFiltersOpen((open) => !open)}
+            aria-expanded={filtersOpen}
+            aria-controls="report-filters"
+          >
+            <ListFilter size={17} /> Filters
+          </button>
           <button
             type="button"
             className="button button--secondary"
             onClick={() => download("docx")}
-            disabled={Boolean(downloadState)}
+            disabled={Boolean(downloadState) || !hasEntries}
           >
             {downloadState === "docx" ? (
               <LoaderCircle className="spin" size={17} />
@@ -156,7 +170,7 @@ const ReportPreview = ({ report, onClose }) => {
             type="button"
             className="button button--primary"
             onClick={() => download("pdf")}
-            disabled={Boolean(downloadState)}
+            disabled={Boolean(downloadState) || !hasEntries}
           >
             {downloadState === "pdf" ? (
               <LoaderCircle className="spin" size={17} />
@@ -165,21 +179,66 @@ const ReportPreview = ({ report, onClose }) => {
             )}
             PDF
           </button>
-          <button
-            type="button"
-            className="icon-button"
-            onClick={onClose}
-            aria-label="Close report preview"
-          >
-            <X size={20} />
-          </button>
         </div>
       </header>
+
+      {filtersOpen && (
+        <section className="report-filters" id="report-filters" aria-label="Report filters">
+          <label className="date-field">
+            <span className="field-label">Start date</span>
+            <span className="date-field__control">
+              <CalendarDays size={17} />
+              <input
+                type="date"
+                value={startDate}
+                onChange={(event) => onStartDateChange(event.target.value)}
+              />
+            </span>
+          </label>
+          <label className="date-field">
+            <span className="field-label">End date</span>
+            <span className="date-field__control">
+              <CalendarDays size={17} />
+              <input
+                type="date"
+                value={endDate}
+                onChange={(event) => onEndDateChange(event.target.value)}
+              />
+            </span>
+          </label>
+          <OwnerPicker
+            owners={owners}
+            selectedIds={selectedOwnerIds}
+            onChange={onSelectedOwnerIdsChange}
+            disabled={!owners.length}
+          />
+          <div className="report-filters__summary" aria-live="polite">
+            Showing {formatRecordCount(report?.ownerCount || 0, "owner")} and{" "}
+            {formatRecordCount(report?.entryCount || 0, "time entry", "time entries")}.
+          </div>
+        </section>
+      )}
+
       {downloadError && <div className="download-error">{downloadError}</div>}
       <main className="report-canvas">
-        {report.matters.map((matter) => (
-          <MatterPage report={report} matter={matter} key={matter.id} />
-        ))}
+        {hasEntries ? (
+          report.matters.map((matter) => (
+            <MatterPage report={report} matter={matter} key={matter.id} />
+          ))
+        ) : (
+          <section className="report-page report-page--empty">
+            <AlertCircle size={28} />
+            <h2>Nothing to show yet</h2>
+            <p>{emptyMessage}</p>
+            <button
+              type="button"
+              className="button button--primary"
+              onClick={() => setFiltersOpen(true)}
+            >
+              <ListFilter size={17} /> Adjust filters
+            </button>
+          </section>
+        )}
       </main>
     </div>
   );
