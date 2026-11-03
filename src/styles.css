@@ -381,13 +381,31 @@ summary:focus-visible {
   border-color: var(--teal);
 }
 
-.report-filters__summary {
+.report-filters__actions {
   min-width: 150px;
-  padding-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.report-filters__summary {
   color: #526872;
   font-size: 12px;
   font-weight: 700;
   line-height: 1.35;
+}
+
+.button--filter-done {
+  min-height: 46px;
+  flex: 0 0 auto;
+  color: #fff;
+  background: var(--teal);
+  border-color: var(--teal);
+}
+
+.button--filter-done:hover:not(:disabled) {
+  background: var(--teal-dark);
+  border-color: var(--teal-dark);
 }
 
 .download-error {
@@ -558,9 +576,9 @@ summary:focus-visible {
     grid-template-columns: 1fr 1fr;
   }
 
-  .report-filters__summary {
+  .report-filters__actions {
     grid-column: 1 / -1;
-    padding-bottom: 0;
+    justify-content: flex-end;
   }
 
   .report-page {
@@ -597,8 +615,13 @@ summary:focus-visible {
   }
 
   .multi-picker,
-  .report-filters__summary {
+  .report-filters__actions {
     grid-column: auto;
+  }
+
+  .report-filters__actions {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .report-canvas {

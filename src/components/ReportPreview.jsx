@@ -3,6 +3,7 @@ import {
   AlertCircle,
   BriefcaseBusiness,
   CalendarDays,
+  Check,
   Clock3,
   Download,
   FileText,
@@ -230,10 +231,19 @@ const ReportPreview = ({
             onChange={onSelectedMatterIdsChange}
             disabled={matterContext || !matters.length}
           />
-          <div className="report-filters__summary" aria-live="polite">
-            Showing {formatRecordCount(report?.matters.length || 0, "matter")},{" "}
-            {formatRecordCount(report?.ownerCount || 0, "owner")}, and{" "}
-            {formatRecordCount(report?.entryCount || 0, "time entry", "time entries")}.
+          <div className="report-filters__actions">
+            <div className="report-filters__summary" aria-live="polite">
+              Showing {formatRecordCount(report?.matters.length || 0, "matter")},{" "}
+              {formatRecordCount(report?.ownerCount || 0, "owner")}, and{" "}
+              {formatRecordCount(report?.entryCount || 0, "time entry", "time entries")}.
+            </div>
+            <button
+              type="button"
+              className="button button--filter-done"
+              onClick={() => setFiltersOpen(false)}
+            >
+              <Check size={17} /> Done
+            </button>
           </div>
         </section>
       )}
